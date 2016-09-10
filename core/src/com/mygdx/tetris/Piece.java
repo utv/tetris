@@ -16,19 +16,25 @@ public class Piece {
     Array<Block> blocks;
     Viewport viewport;
     boolean isMoving;
+    boolean canRotate;
 
     public Piece(Viewport viewport) {
         this.viewport = viewport;
         this.blocks = new Array<Block>(Constants.PIECE_SIZE);
         this.isMoving = true;
+        this.canRotate = true;
     }
 
     public void update(float delta) {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-            this.rotate90();
-        }
-
         if (isMoving) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+                this.rotate(false);
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
+                this.rotate(true);
+            }
+
             for (Block block : blocks) {
                 block.update(delta);
             }
@@ -54,12 +60,14 @@ public class Piece {
         return false;
     }
 
-    private void rotate90() {
+    private void rotate(boolean clockwise) {
+        if (!this.canRotate) return;
+
         // rotates about first block of a piece itself.
         Vector2 centroid = this.blocks.get(0).pos;
         for (int i = 0; i < blocks.size; i++) {
             if (i > 0) {
-                this.blocks.get(i).rotate90(centroid, false);
+                this.blocks.get(i).rotate90(centroid, clockwise);
             }
         }
     }

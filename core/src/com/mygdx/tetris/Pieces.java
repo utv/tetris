@@ -23,6 +23,10 @@ public class Pieces {
         if (pieceList.size == 0) pieceList.add(new Stick(viewport));
     }
 
+    private void generate() {
+
+    }
+
     public void update(float delta) {
         Piece latest = pieceList.get(pieceList.size - 1);
         // field is not empty
