@@ -9,9 +9,12 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class Stick extends Piece {
     public Stick(Viewport viewport) {
         super(viewport);
+
         for (int i = 0; i < Constants.PIECE_SIZE; i++) {
-            float x = viewport.getWorldWidth() / 2 - 2 * Constants.BLOCK_SIZE;
-            Vector2 pos = new Vector2(x + i * Constants.BLOCK_SIZE, viewport.getWorldHeight() / 2);
+//            float x = Constants.FIELD_WIDTH * this.blockRatioWidth / 2 - 2 * this.blockRatioWidth;
+            float x = (Constants.FIELD_WIDTH * Constants.BLOCK_SIZE / 2) - 2 * Constants.BLOCK_SIZE;
+            float y = Constants.FIELD_HEIGHT / 2;
+            Vector2 pos = new Vector2(x + i * Constants.BLOCK_SIZE, y);
             this.blocks.add(new Block(pos));
         }
     }

@@ -12,11 +12,12 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class Block {
     Vector2 pos;
     Vector2 velocity;
-    Viewport viewport;
+
 
     public Block(Vector2 pos) {
         this.pos = pos;
         this.velocity = Constants.BLOCK_VELOCITY;
+
     }
 
     public void update(float delta) {

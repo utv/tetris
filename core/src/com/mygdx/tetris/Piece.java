@@ -3,10 +3,13 @@ package com.mygdx.tetris;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.g3d.particles.influencers.ColorInfluencer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import java.util.Random;
 
 /**
  * Created by Computer on 9/8/2016.
@@ -18,11 +21,18 @@ public class Piece {
     boolean isMoving;
     boolean canRotate;
 
+
     public Piece(Viewport viewport) {
         this.viewport = viewport;
-        this.blocks = new Array<Block>(Constants.PIECE_SIZE);
         this.isMoving = true;
         this.canRotate = true;
+
+        init();
+    }
+
+
+    public void init() {
+        this.blocks = new Array<Block>(Constants.PIECE_SIZE);
     }
 
     public void update(float delta) {
@@ -39,18 +49,6 @@ public class Piece {
                 block.update(delta);
             }
         }
-    }
-
-    public boolean checkCollision(Piece anotherPiece) {
-        // hits died piece or not
-        for (Block anotherBlock : anotherPiece.blocks) {
-            for (int i = 0; i < this.blocks.size; i++) {
-                if (this.blocks.get(i).pos.y - anotherBlock.pos.y <= Constants.BLOCK_SIZE)
-                    return true;
-            }
-        }
-
-        return isHitGround();
     }
 
     public boolean isHitGround() {
@@ -77,4 +75,5 @@ public class Piece {
             block.render(renderer);
         }
     }
+
 }
