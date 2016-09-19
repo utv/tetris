@@ -1,6 +1,7 @@
 package com.mygdx.tetris;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -23,7 +24,6 @@ public class TetrisScreen extends InputAdapter implements Screen {
     ScreenViewport hudViewport;
     Field field;
     Piece piece;
-    Constants.State state;
     ShapeRenderer renderer;
 
     @Override
@@ -32,23 +32,15 @@ public class TetrisScreen extends InputAdapter implements Screen {
         renderer = new ShapeRenderer();
         renderer.setAutoShapeType(true);
         field = new Field(this.tetrisViewport);
-        state = Constants.State.PIECE_MOVING;
+        piece = new Piece(this.tetrisViewport);
         Gdx.input.setInputProcessor(this);
-    }
-
-    private Piece generatePiece() {
-        int rand = new Random().nextInt(2);
-        if (rand == 0) return new Square(this.tetrisViewport);
-        if (rand == 1) return new Stick(this.tetrisViewport);
-        return new Stick(this.tetrisViewport);
     }
 
     @Override
     public void render(float delta) {
         // processInput
-        if (!piece.isMoving) piece = generatePiece();
-        processInput(delta, piece);
         // update
+        if (!piece.isMoving) piece.generate();
         piece.update(delta);
         field.update(piece);
 
@@ -64,15 +56,13 @@ public class TetrisScreen extends InputAdapter implements Screen {
         renderer.end();
     }
 
-    private void processInput(float delta, Piece piece) {
-
-    }
-
     @Override
     public void resize(int width, int height) {
         tetrisViewport.update(width, height, true);
         field.init();
-        piece = generatePiece();
+        piece.init();
+
+
     }
 
     @Override

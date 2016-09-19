@@ -19,9 +19,4 @@ public class Constants {
     public static final Vector2 BLOCK_ACCELERATION = new Vector2(0, -5.0f);
     public static final Vector2 BLOCK_VELOCITY = new Vector2(0, -5.0f);
 
-    enum State {
-        PIECE_MOVING,
-        PIECE_STOP
-    };
-
 }

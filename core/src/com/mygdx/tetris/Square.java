@@ -10,7 +10,10 @@ public class Square extends Piece {
     public Square(Viewport viewport) {
         super(viewport);
         this.canRotate = false;
-        
+        create();
+    }
+
+    public void create() {
         for (int i = 0; i < Constants.PIECE_SIZE; i++) {
 //            float x = Constants.FIELD_WIDTH * this.blockRatioWidth / 2 - 2 * this.blockRatioWidth;
             float x = (Constants.FIELD_WIDTH * Constants.BLOCK_SIZE / 2) - 2 * Constants.BLOCK_SIZE;

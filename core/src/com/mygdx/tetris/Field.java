@@ -30,9 +30,11 @@ public class Field {
 
     public void update(Piece piece) {
         if (isPieceCollided(piece)) {
+            Gdx.app.log(TAG, "piece size = " + piece.blocks.size);
             for (Block block : piece.blocks) {
                 int row = MathUtils.ceil(block.pos.y);
                 int col = MathUtils.ceil(block.pos.x);
+                Gdx.app.log(TAG, "col = " + col + ", row = " + row);
                 Vector2 pos = new Vector2(col, row);
                 if (this.blocks[row][col] == null) this.blocks[row][col] = new Block(pos);
 
@@ -47,8 +49,11 @@ public class Field {
                 if (blocks[row][col] != null) {
                     for (Block block : piece.blocks) {
                         if (block.pos.dst(blocks[row][col].pos) <= Constants.BLOCK_SIZE
-                                && block.pos.x == blocks[row][col].pos.x)
+                                && block.pos.x == blocks[row][col].pos.x) {
+                            Gdx.app.log(TAG, "isPieceCollided:: col = " + col + ", row = " + row);
                             return true;
+                        }
+
                     }
                 }
             }
