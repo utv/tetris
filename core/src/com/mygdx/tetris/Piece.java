@@ -20,23 +20,13 @@ public class Piece implements Cloneable {
     Viewport viewport;
     boolean isMoving;
     boolean canRotate;
+    Constants.PieceType type;
 
     public Piece(Viewport viewport) {
         this.viewport = viewport;
         this.isMoving = true;
         this.canRotate = true;
         init();
-    }
-
-    public void copy(Piece piece) {
-        if (this.blocks != null) {
-            for (int i = 0; i < Constants.PIECE_SIZE; i++) {
-                this.blocks.set(i, piece.blocks.get(i));
-            }
-        }
-
-        this.canRotate = piece.canRotate;
-        this.isMoving = piece.isMoving;
     }
 
     public void init() {
@@ -50,37 +40,38 @@ public class Piece implements Cloneable {
     public void generate() {
         int rand = new Random().nextInt(2);
         if (rand == 0) {
-            square();
+            square(Constants.squareOrigin);
         }
         else if (rand == 1) {
-            stick();
+            stick(Constants.stickOrigin);
         }
-        else square();
+        else square(Constants.squareOrigin);
     }
 
-    public void square() {
+    public void square(Vector2 origin) {
+        this.type = Constants.PieceType.SQUARE;
         this.canRotate = false;
         this.isMoving = true;
         for (int i = 0; i < Constants.PIECE_SIZE; i++) {
-//            float x = Constants.FIELD_WIDTH * this.blockRatioWidth / 2 - 2 * this.blockRatioWidth;
-            float x = (Constants.FIELD_WIDTH * Constants.BLOCK_SIZE / 2) - 2 * Constants.BLOCK_SIZE;
-            float y = Constants.FIELD_HEIGHT;
-            Vector2 pos = new Vector2(x + (i % 2) * Constants.BLOCK_SIZE, y + (i / 2) * Constants.BLOCK_SIZE);
+            /*float x = (Constants.FIELD_WIDTH * Constants.BLOCK_SIZE / 2) - 2 * Constants.BLOCK_SIZE;
+            float y = Constants.FIELD_HEIGHT;*/
+            Vector2 pos = new Vector2(origin.x + (i % 2) * Constants.BLOCK_SIZE, origin.y + (i / 2) * Constants.BLOCK_SIZE);
             this.blocks.set(i, new Block(pos));
         }
     }
 
-    public void stick() {
+    public void stick(Vector2 origin) {
+        this.type = Constants.PieceType.STICK;
         this.canRotate = true;
         this.isMoving = true;
         for (int i = 0; i < Constants.PIECE_SIZE; i++) {
-//            float x = Constants.FIELD_WIDTH * this.blockRatioWidth / 2 - 2 * this.blockRatioWidth;
-            float x = (Constants.FIELD_WIDTH * Constants.BLOCK_SIZE / 2) - 2 * Constants.BLOCK_SIZE;
-            float y = Constants.FIELD_HEIGHT / 2;
-            Vector2 pos = new Vector2(x + i * Constants.BLOCK_SIZE, y);
+            /*float x = (Constants.FIELD_WIDTH * Constants.BLOCK_SIZE / 2) - 2 * Constants.BLOCK_SIZE;
+            float y = Constants.FIELD_HEIGHT / 2;*/
+            Vector2 pos = new Vector2(origin.x + i * Constants.BLOCK_SIZE, origin.y);
             this.blocks.set(i, new Block(pos));
         }
     }
+
 
     public void update(float delta) {
         // process input
@@ -93,10 +84,50 @@ public class Piece implements Cloneable {
                 this.rotate(true);
             }
 
+            if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+                moveLeft();
+                if (!isOnField()) {
+                    // resets positions
+                    for (int i = 0; i < Constants.PIECE_SIZE; i++) {
+                        this.blocks.get(i).pos.x += Constants.BLOCK_SIZE;
+                    }
+                }
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+                moveRight();
+                if (!isOnField()) {
+                    // resets positions
+                    for (int i = 0; i < Constants.PIECE_SIZE; i++) {
+                        this.blocks.get(i).pos.x -= Constants.BLOCK_SIZE;
+                    }
+                }
+            }
+
             for (Block block : blocks) {
                 block.update(delta);
             }
         }
+    }
+
+    private void moveLeft() {
+        for (Block block : blocks) {
+            block.pos.x -= Constants.BLOCK_SIZE;
+        }
+    }
+
+    private void moveRight() {
+        for (Block block : blocks) {
+            block.pos.x += Constants.BLOCK_SIZE;
+        }
+    }
+
+    private boolean isOnField() {
+        for (Block block : blocks) {
+            if (block.pos.x < 0) return false;
+            if (block.pos.x > (Constants.FIELD_WIDTH - 1) * Constants.BLOCK_SIZE) return false;
+        }
+        return true;
     }
 
     public boolean isHitGround() {

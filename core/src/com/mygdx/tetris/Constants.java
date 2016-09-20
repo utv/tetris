@@ -19,4 +19,14 @@ public class Constants {
     public static final Vector2 BLOCK_ACCELERATION = new Vector2(0, -5.0f);
     public static final Vector2 BLOCK_VELOCITY = new Vector2(0, -5.0f);
 
+    public static final Vector2 squareOrigin = new Vector2(
+        (Constants.FIELD_WIDTH * Constants.BLOCK_SIZE / 2) - 2 * Constants.BLOCK_SIZE,
+        Constants.FIELD_HEIGHT);
+    public static final Vector2 stickOrigin = new Vector2(
+        (Constants.FIELD_WIDTH * Constants.BLOCK_SIZE / 2) - 2 * Constants.BLOCK_SIZE,
+        Constants.FIELD_HEIGHT / 2);
+
+    enum PieceType {
+        SQUARE, STICK;
+    }
 }
