@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * Created by Computer on 9/8/2016.
  */
 public class Block {
+    public static final String TAG = Block.class.getName();
     Vector2 pos;
     Vector2 velocity;
 

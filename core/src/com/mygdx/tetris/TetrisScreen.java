@@ -7,11 +7,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
-import java.util.Random;
 
 /**
  * Created by Computer on 9/8/2016.
@@ -22,6 +21,7 @@ public class TetrisScreen extends InputAdapter implements Screen {
 
     ExtendViewport tetrisViewport;
     ScreenViewport hudViewport;
+    Constants.State state;
     Field field;
     Piece piece;
     ShapeRenderer renderer;
@@ -33,16 +33,16 @@ public class TetrisScreen extends InputAdapter implements Screen {
         renderer.setAutoShapeType(true);
         field = new Field(this.tetrisViewport);
         piece = new Piece(this.tetrisViewport);
+        state = Constants.State.PIECE_MOVING;
         Gdx.input.setInputProcessor(this);
     }
 
     @Override
     public void render(float delta) {
         // processInput
+        processInput(delta, state, piece, field);
         // update
-        if (!piece.isMoving) piece.generate();
-        piece.update(delta);
-        field.update(piece);
+        update(delta, state, piece, field);
 
         // render
         tetrisViewport.apply(true);
@@ -51,9 +51,35 @@ public class TetrisScreen extends InputAdapter implements Screen {
 
         renderer.setProjectionMatrix(tetrisViewport.getCamera().combined);
         renderer.begin();
-        if (piece.isMoving) piece.render(renderer);
+        piece.render(renderer);
         field.render(renderer);
         renderer.end();
+    }
+
+    private void update(float delta, Constants.State state, Piece piece, Field field) {
+
+        piece.update(delta, field);
+    }
+
+    private void processInput(float delta, Constants.State state, Piece piece, Field field) {
+
+        if (piece.isMoving){
+            if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+                piece.rotate(false);
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
+                piece.rotate(true);
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+                piece.moveLeft(field);
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+                piece.moveRight(field);
+            }
+        }
     }
 
     @Override
@@ -61,8 +87,7 @@ public class TetrisScreen extends InputAdapter implements Screen {
         tetrisViewport.update(width, height, true);
         field.init();
         piece.init();
-
-
+        piece.generate();
     }
 
     @Override

@@ -24,7 +24,11 @@ public class Constants {
         Constants.FIELD_HEIGHT);
     public static final Vector2 stickOrigin = new Vector2(
         (Constants.FIELD_WIDTH * Constants.BLOCK_SIZE / 2) - 2 * Constants.BLOCK_SIZE,
-        Constants.FIELD_HEIGHT / 2);
+        Constants.FIELD_HEIGHT);
+
+    enum State {
+        PIECE_MOVING, PIECE_HIT;
+    }
 
     enum PieceType {
         SQUARE, STICK;
