@@ -2,6 +2,7 @@ package com.mygdx.tetris;
 
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -20,6 +21,7 @@ public class Piece {
     boolean isMoving;
     boolean canRotate;
     Constants.PieceType type;
+    Vector2 centroid;
 
     public Piece(Viewport viewport) {
         this.viewport = viewport;
@@ -209,15 +211,13 @@ public class Piece {
     public void rotate(boolean clockwise) {
         if (!this.canRotate) return;
 
-        // rotates about first block of a piece itself.
-        Vector2 centroid = this.blocks.get(0).pos;
+        // rotates about first block of a piece itself. FIX!!
+        Vector2 centroid = this.blocks.get(1).pos;
         for (int i = 0; i < blocks.size; i++) {
-            if (i > 0) {
+            if (this.blocks.get(i).pos != centroid) {
                 this.blocks.get(i).rotate90(centroid, clockwise);
             }
         }
-        Vector2 pos = getFieldPosition(this.blocks.get(0).pos);
-        Gdx.app.log(TAG, "field pos x =" + pos.x + ", y = " + pos.y);
     }
 
     public void render(ShapeRenderer renderer) {
