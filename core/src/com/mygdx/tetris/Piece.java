@@ -74,6 +74,7 @@ public class Piece {
     public void update(float delta, Field field) {
         if (isHitGround() || isOnTopOfAnotherBlock(field)) {
             this.addPieceToField(field);
+
             //this.isMoving = false;
             this.generate();
         }
@@ -126,17 +127,17 @@ public class Piece {
     public boolean isOverlap(Array<Vector2> positions, Field field) {
         for (int row = 0; row < Constants.FIELD_HEIGHT; row++) {
             for (int col = 0; col < Constants.FIELD_WIDTH; col++) {
-                for (int i = 0; i < Constants.PIECE_SIZE; i++) {
-                    Vector2 pos = this.blocks.get(i).pos;
-                    if (field.blocks[row][col] != null
-                            && getFieldColumn(pos.x) == col
-                            && getFieldRow(pos.y) == row) {
-                        Gdx.app.log(TAG, "isOverlap: row = " + row + ", col = " + col);
-                        return true;
+                if (field.blocks[row][col] != null) {
+                    for (int i = 0; i < Constants.PIECE_SIZE; i++) {
+                        Vector2 pos = positions.get(i);
+                        if (getFieldColumn(pos.x) == col && getFieldRow(pos.y) == row) {
+                            return true;
+                        }
                     }
                 }
             }
         }
+
         return false;
     }
 
@@ -159,7 +160,6 @@ public class Piece {
     }
 
     public boolean isValidMove(Vector2 direction, Field field) {
-        // Test if a piece move is valid ******* FIX HERE
         Array<Vector2> positions = new Array<Vector2>(Constants.PIECE_SIZE);
         for (int i = 0; i < Constants.PIECE_SIZE; i++) {
             Vector2 block = this.blocks.get(i).pos;
@@ -177,8 +177,7 @@ public class Piece {
         for (Block block : this.blocks) {
             int row = getFieldRow(block.pos.y);
             int col = getFieldColumn(block.pos.x);
-            Gdx.app.log(TAG, "x = " + block.pos.x + ", y = " + block.pos.y);
-            Gdx.app.log(TAG, "row = " + row + ", col = " + col);
+
             if (field.blocks[row][col] == null)
                 field.blocks[row][col] = new Block(new Vector2(block.pos.x, block.pos.y));
         }
@@ -186,13 +185,15 @@ public class Piece {
 
     public void moveLeft(Field field) {
         Vector2 direction = new Vector2(Constants.BLOCK_SIZE * -1.0f, 0);
-        if (!isValidMove(direction, field))
+        if (!isValidMove(direction, field)) {
             return;
+        }
 
         // updates new positions for a piece.
         for (Block block : blocks) {
             block.pos.x -= Constants.BLOCK_SIZE;
         }
+
     }
 
     public void moveRight(Field field) {
