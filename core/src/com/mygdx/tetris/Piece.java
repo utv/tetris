@@ -41,7 +41,8 @@ public class Piece {
     public void generate() {
         int rand = new Random().nextInt(2);
         if (rand == 0) {
-            square(Constants.squareOrigin);
+            //square(Constants.squareOrigin);
+            stick(Constants.stickOrigin);
         }
         else if (rand == 1) {
             stick(Constants.stickOrigin);
@@ -50,7 +51,7 @@ public class Piece {
 
     public void square(Vector2 origin) {
         this.type = Constants.PieceType.SQUARE;
-        this.canRotate = false;
+        this.canRotate = true;
         this.isMoving = true;
         for (int i = 0; i < Constants.PIECE_SIZE; i++) {
             /*float x = (Constants.FIELD_WIDTH * Constants.BLOCK_SIZE / 2) - 2 * Constants.BLOCK_SIZE;
@@ -58,6 +59,7 @@ public class Piece {
             Vector2 pos = new Vector2(origin.x + (i % 2) * Constants.BLOCK_SIZE, origin.y + (i / 2) * Constants.BLOCK_SIZE);
             this.blocks.set(i, new Block(pos));
         }
+        this.centroid = this.blocks.get(3).pos;
     }
 
     public void stick(Vector2 origin) {
@@ -70,6 +72,7 @@ public class Piece {
             Vector2 pos = new Vector2(origin.x + i * Constants.BLOCK_SIZE, origin.y);
             this.blocks.set(i, new Block(pos));
         }
+        this.centroid = this.blocks.get(2).pos;
     }
 
 
@@ -99,13 +102,21 @@ public class Piece {
     }
 
     private int getFieldRow(float y) {
-        int row = MathUtils.ceil(y);
+        int remainder  = (int) (y % Constants.FIELD_HEIGHT);
+        int row;
+        if (y - remainder > 0.5) row = MathUtils.ceil(y);
+        else row = MathUtils.floor(y);
+
         row = Math.max(0, row);
         return Math.min(Constants.FIELD_HEIGHT - 1, row);
     }
 
     private int getFieldColumn(float x) {
-        int col = MathUtils.ceil(x);
+        int remainder  = (int) (x % Constants.FIELD_WIDTH);
+        int col;
+        if (x - remainder > 0.5) col = MathUtils.ceil(x);
+        else col = MathUtils.floor(x);
+
         col = Math.max(0, col);
         return Math.min(Constants.FIELD_WIDTH - 1, col);
     }
@@ -176,13 +187,21 @@ public class Piece {
     }
 
     private void addPieceToField(Field field) {
+        int num = 0;
         for (Block block : this.blocks) {
             int row = getFieldRow(block.pos.y);
             int col = getFieldColumn(block.pos.x);
+            Gdx.app.log(TAG, "x = " + block.pos.x + ", y = " + block.pos.y);
+            Gdx.app.log(TAG, "row = " + row + ", col = " + col);
+            if (field.blocks[row][col] == null) {
+                float x = col * Constants.BLOCK_SIZE;
+                float y = row * Constants.BLOCK_SIZE;
+                field.blocks[row][col] = new Block(new Vector2(x, y));
 
-            if (field.blocks[row][col] == null)
-                field.blocks[row][col] = new Block(new Vector2(block.pos.x, block.pos.y));
+            }
+            num++;
         }
+        Gdx.app.log(TAG, "num = " + num);
     }
 
     public void moveLeft(Field field) {
@@ -211,12 +230,10 @@ public class Piece {
     public void rotate(boolean clockwise) {
         if (!this.canRotate) return;
 
-        // rotates about first block of a piece itself. FIX!!
-        Vector2 centroid = this.blocks.get(1).pos;
+        // rotates about first block of a piece itself.
         for (int i = 0; i < blocks.size; i++) {
-            if (this.blocks.get(i).pos != centroid) {
-                this.blocks.get(i).rotate90(centroid, clockwise);
-            }
+            this.blocks.get(i).rotate90(this.centroid, clockwise);
+
         }
     }
 
