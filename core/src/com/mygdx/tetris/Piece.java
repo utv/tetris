@@ -92,12 +92,10 @@ public class Piece {
     }
 
     private Vector2 getFieldPosition(Vector2 blockPos) {
-        int row = MathUtils.ceil(blockPos.y);
-        int col = MathUtils.ceil(blockPos.x);
-        row = Math.max(0, row);
-        col = Math.max(0, col);
-        row = Math.min(Constants.FIELD_HEIGHT - 1, row);
-        col = Math.min(Constants.FIELD_WIDTH - 1, col);
+        int row = getFieldRow(blockPos.y);
+        int col = getFieldColumn(blockPos.x);
+        blockPos.x = col * Constants.BLOCK_SIZE;
+        blockPos.y = row * Constants.BLOCK_SIZE;
         return new Vector2(col, row);
     }
 
@@ -230,10 +228,9 @@ public class Piece {
     public void rotate(boolean clockwise) {
         if (!this.canRotate) return;
 
-        // rotates about first block of a piece itself.
+        // rotates about the centroid.
         for (int i = 0; i < blocks.size; i++) {
             this.blocks.get(i).rotate90(this.centroid, clockwise);
-
         }
     }
 
