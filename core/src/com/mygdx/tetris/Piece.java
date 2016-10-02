@@ -39,19 +39,39 @@ public class Piece {
     }
 
     public void generate() {
-        int rand = new Random().nextInt(2);
+        int rand = new Random().nextInt(3);
         if (rand == 0) {
-            //square(Constants.squareOrigin);
-            stick(Constants.stickOrigin);
+            square(Constants.squareOrigin);
+            //stick(Constants.stickOrigin);
         }
         else if (rand == 1) {
             stick(Constants.stickOrigin);
         }
+        else if (rand == 2) {
+            tShape(Constants.pieceOrigin);
+        }
+    }
+
+    /*
+     *   T shape
+     */
+    public void tShape(Vector2 origin) {
+        this.type = Constants.PieceType.T_SHAPE;
+        this.canRotate = true;
+        this.isMoving = true;
+        for (int i = 0; i < Constants.PIECE_SIZE - 1; i++) {
+            Vector2 pos = new Vector2(origin.x + i * Constants.BLOCK_SIZE, origin.y);
+            this.blocks.set(i, new Block(pos));
+        }
+
+        Vector2 pos = new Vector2(origin.x + Constants.BLOCK_SIZE, origin.y + Constants.BLOCK_SIZE);
+        this.blocks.set(Constants.PIECE_SIZE - 1, new Block(pos));
+        this.centroid = this.blocks.get(1).pos;
     }
 
     public void square(Vector2 origin) {
         this.type = Constants.PieceType.SQUARE;
-        this.canRotate = true;
+        this.canRotate = false;
         this.isMoving = true;
         for (int i = 0; i < Constants.PIECE_SIZE; i++) {
             /*float x = (Constants.FIELD_WIDTH * Constants.BLOCK_SIZE / 2) - 2 * Constants.BLOCK_SIZE;
@@ -59,9 +79,12 @@ public class Piece {
             Vector2 pos = new Vector2(origin.x + (i % 2) * Constants.BLOCK_SIZE, origin.y + (i / 2) * Constants.BLOCK_SIZE);
             this.blocks.set(i, new Block(pos));
         }
-        this.centroid = this.blocks.get(3).pos;
+        //this.centroid = this.blocks.get(3).pos;
     }
 
+    /*
+     * Line shape
+     */
     public void stick(Vector2 origin) {
         this.type = Constants.PieceType.STICK;
         this.canRotate = true;
