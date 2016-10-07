@@ -142,9 +142,9 @@ public class Piece {
         return Math.min(Constants.FIELD_WIDTH - 1, col);
     }
 
-    private boolean isOnField(Array<Vector2> positions) {
-        for (Vector2 pos: positions) {
-            int col = MathUtils.ceil(pos.x);
+    private boolean isOnField(Array<Block> newBlocks) {
+        for (Block block: newBlocks) {
+            int col = MathUtils.ceil(block.pos.x);
             if (col < 0) return false;
             if (col > (Constants.FIELD_WIDTH - 1) * Constants.BLOCK_SIZE) return false;
         }
@@ -158,12 +158,12 @@ public class Piece {
         return false;
     }
 
-    public boolean isOverlap(Array<Vector2> positions, Field field) {
+    public boolean isOverlap(Array<Block> newBlocks, Field field) {
         for (int row = 0; row < Constants.FIELD_HEIGHT; row++) {
             for (int col = 0; col < Constants.FIELD_WIDTH; col++) {
                 if (field.blocks[row][col] != null) {
                     for (int i = 0; i < Constants.PIECE_SIZE; i++) {
-                        Vector2 pos = positions.get(i);
+                        Vector2 pos = newBlocks.get(i).pos;
                         if (getFieldColumn(pos.x) == col && getFieldRow(pos.y) == row) {
                             return true;
                         }
@@ -193,15 +193,8 @@ public class Piece {
         return false;
     }
 
-    public boolean isValidMove(Vector2 direction, Field field) {
-        Array<Vector2> positions = new Array<Vector2>(Constants.PIECE_SIZE);
-        for (int i = 0; i < Constants.PIECE_SIZE; i++) {
-            Vector2 block = this.blocks.get(i).pos;
-            Vector2 pos = new Vector2(block.x + direction.x, block.y + direction.y);
-            positions.add(pos);
-        }
-
-        if (isOverlap(positions, field) || !isOnField(positions))
+    public boolean isValidMove(Array<Block> blocks, Field field) {
+        if (isOverlap(blocks, field) || !isOnField(blocks))
             return false;
 
         return true;
@@ -226,8 +219,14 @@ public class Piece {
     }
 
     public void moveLeft(Field field) {
-        Vector2 direction = new Vector2(Constants.BLOCK_SIZE * -1.0f, 0);
-        if (!isValidMove(direction, field)) {
+        // new block positions
+        Array<Block> newBlocks = new Array<Block>(Constants.PIECE_SIZE);
+        for (int i = 0; i < Constants.PIECE_SIZE; i++) {
+            newBlocks.add(new Block(this.blocks.get(i).pos));
+            newBlocks.get(i).pos.x -= Constants.BLOCK_SIZE;
+        }
+
+        if (!isValidMove(newBlocks, field)) {
             return;
         }
 
@@ -239,13 +238,21 @@ public class Piece {
     }
 
     public void moveRight(Field field) {
-        Vector2 direction = new Vector2(Constants.BLOCK_SIZE * 1.0f, 0);
-        if (!isValidMove(direction, field))
+        // new block positions
+        Array<Block> newBlocks = new Array<Block>(Constants.PIECE_SIZE);
+        for (int i = 0; i < Constants.PIECE_SIZE; i++) {
+            newBlocks.add(new Block(this.blocks.get(i).pos));
+            newBlocks.get(i).pos.x += Constants.BLOCK_SIZE;
+        }
+
+        if (!isValidMove(newBlocks, field)) {
             return;
+        }
 
         for (Block block : blocks) {
             block.pos.x += Constants.BLOCK_SIZE;
         }
+
     }
 
     public void rotate(boolean clockwise) {

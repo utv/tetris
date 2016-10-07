@@ -16,9 +16,8 @@ public class Block {
 
 
     public Block(Vector2 pos) {
-        this.pos = pos;
+        this.pos = new Vector2(pos.x, pos.y);
         this.velocity = Constants.BLOCK_VELOCITY;
-
     }
 
     public void update(float delta) {
