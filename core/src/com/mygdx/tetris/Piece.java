@@ -264,6 +264,13 @@ public class Piece {
         }
     }
 
+    public void attach() {
+        for (Block block :
+                this.blocks) {
+            block.velocity.y *= 10.5f;
+        }
+    }
+
     public void render(ShapeRenderer renderer) {
         for (Block block : blocks) {
             block.render(renderer);
