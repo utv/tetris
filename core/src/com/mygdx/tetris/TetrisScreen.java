@@ -65,12 +65,12 @@ public class TetrisScreen extends InputAdapter implements Screen {
 
         if (piece.isMoving){
             if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-                piece.rotate(false);
+                piece.rotate(false, field);
                 return;
             }
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
-                piece.rotate(true);
+                piece.rotate(true, field);
                 return;
             }
 

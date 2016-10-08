@@ -22,6 +22,7 @@ public class Piece {
     boolean canRotate;
     Constants.PieceType type;
     Vector2 centroid;
+    int centroidBlockPos;
 
     public Piece(Viewport viewport) {
         this.viewport = viewport;
@@ -67,6 +68,7 @@ public class Piece {
         Vector2 pos = new Vector2(origin.x + Constants.BLOCK_SIZE, origin.y + Constants.BLOCK_SIZE);
         this.blocks.set(Constants.PIECE_SIZE - 1, new Block(pos));
         this.centroid = this.blocks.get(1).pos;
+        this.centroidBlockPos = 1;
     }
 
     public void square(Vector2 origin) {
@@ -96,8 +98,8 @@ public class Piece {
             this.blocks.set(i, new Block(pos));
         }
         this.centroid = this.blocks.get(2).pos;
+        this.centroidBlockPos = 2;
     }
-
 
     public void update(float delta, Field field) {
         if (isHitGround() || isOnTopOfAnotherBlock(field)) {
@@ -223,16 +225,12 @@ public class Piece {
         Array<Block> newBlocks = new Array<Block>(Constants.PIECE_SIZE);
         for (int i = 0; i < Constants.PIECE_SIZE; i++) {
             newBlocks.add(new Block(this.blocks.get(i).pos));
-            newBlocks.get(i).pos.x -= Constants.BLOCK_SIZE;
+            Block added = newBlocks.peek();
+            added.pos.x -= Constants.BLOCK_SIZE;
         }
 
-        if (!isValidMove(newBlocks, field)) {
-            return;
-        }
-
-        // updates new positions for a piece.
-        for (Block block : blocks) {
-            block.pos.x -= Constants.BLOCK_SIZE;
+        if (isValidMove(newBlocks, field)) {
+            this.blocks = newBlocks;
         }
 
     }
@@ -242,26 +240,35 @@ public class Piece {
         Array<Block> newBlocks = new Array<Block>(Constants.PIECE_SIZE);
         for (int i = 0; i < Constants.PIECE_SIZE; i++) {
             newBlocks.add(new Block(this.blocks.get(i).pos));
-            newBlocks.get(i).pos.x += Constants.BLOCK_SIZE;
+            Block added = newBlocks.peek();
+            added.pos.x += Constants.BLOCK_SIZE;
         }
 
-        if (!isValidMove(newBlocks, field)) {
-            return;
-        }
-
-        for (Block block : blocks) {
-            block.pos.x += Constants.BLOCK_SIZE;
+        if (isValidMove(newBlocks, field)) {
+            this.blocks = newBlocks;
         }
 
     }
 
-    public void rotate(boolean clockwise) {
+    public void rotate(boolean clockwise, Field field) {
         if (!this.canRotate) return;
 
-        // rotates about the centroid.
-        for (int i = 0; i < blocks.size; i++) {
-            this.blocks.get(i).rotate90(this.centroid, clockwise);
+        Array<Block> newBlocks = new Array<Block>(Constants.PIECE_SIZE);
+        Vector2 newCentroid = new Vector2(this.centroid.x, this.centroid.y);
+        for (int i = 0; i < Constants.PIECE_SIZE; i++) {
+            newBlocks.add(new Block(this.blocks.get(i).pos));
         }
+
+        for (int i = 0; i < Constants.PIECE_SIZE; i++) {
+            Block centroid = newBlocks.get(this.centroidBlockPos);
+            newBlocks.get(i).rotate90(centroid.pos, clockwise);
+        }
+
+        if (isValidMove(newBlocks, field)) {
+            this.blocks = newBlocks;
+            this.centroid = newCentroid;
+        }
+
     }
 
     public void attach() {
