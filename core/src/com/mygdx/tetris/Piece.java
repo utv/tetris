@@ -67,8 +67,9 @@ public class Piece {
 
         Vector2 pos = new Vector2(origin.x + Constants.BLOCK_SIZE, origin.y + Constants.BLOCK_SIZE);
         this.blocks.set(Constants.PIECE_SIZE - 1, new Block(pos));
-        this.centroid = this.blocks.get(1).pos;
-        this.centroidBlockPos = 1;
+        this.centroid =
+            new Vector2(this.blocks.get(1).pos.x + Constants.BLOCK_SIZE / 2, this.blocks.get(1).pos.y + Constants.BLOCK_SIZE / 2);
+
     }
 
     public void square(Vector2 origin) {
@@ -97,21 +98,25 @@ public class Piece {
             Vector2 pos = new Vector2(origin.x + i * Constants.BLOCK_SIZE, origin.y);
             this.blocks.set(i, new Block(pos));
         }
-        this.centroid = this.blocks.get(2).pos;
-        this.centroidBlockPos = 2;
+        this.centroid = new Vector2(this.blocks.get(2).pos.x, this.blocks.get(2).pos.y);
     }
 
     public void update(float delta, Field field) {
-        if (isHitGround() || isOnTopOfAnotherBlock(field)) {
+        if (isHitGround()) {
             this.addPieceToField(field);
-
-            //this.isMoving = false;
+            this.generate();
+        }
+        else if (isOnTopOfAnotherBlock(field)) {
+            this.addPieceToField(field);
             this.generate();
         }
         else if (this.isMoving) {
             for (Block block : blocks) {
                 block.update(delta);
             }
+
+            // updates centroids
+            this.centroid.mulAdd(this.blocks.get(0).velocity, delta);
 
         }
     }
@@ -178,18 +183,12 @@ public class Piece {
     }
 
     private boolean isOnTopOfAnotherBlock(Field field) {
-        for (int row = 0; row < Constants.FIELD_HEIGHT; row++) {
-            for (int col = 0; col < Constants.FIELD_WIDTH; col++) {
-                if (field.blocks[row][col] != null) {
-                    for (Block block : this.blocks) {
-                        int blockRow = getFieldRow(block.pos.y);
-                        int blockCol = getFieldColumn(block.pos.x);
-                        if (blockRow == row + 1 && blockCol == col) {
-                            Gdx.app.log(TAG, "isOnTopOfAnotherBlock:: row = " + row + ", col = " + col);
-                            return true;
-                        }
-                    }
-                }
+        for (Block block : this.blocks) {
+            int blockRow = getFieldRow(block.pos.y);
+            int blockCol = getFieldColumn(block.pos.x);
+            if (blockRow - 1 >= 0 && field.blocks[blockRow - 1][blockCol] != null) {
+                Gdx.app.log(TAG, "Yes::isOnTopOfAnotherBlock:: row = " + blockRow  + ", col = " + blockCol);
+                return true;
             }
         }
         return false;
@@ -231,6 +230,7 @@ public class Piece {
 
         if (isValidMove(newBlocks, field)) {
             this.blocks = newBlocks;
+            this.centroid.x -= Constants.BLOCK_SIZE;
         }
 
     }
@@ -246,6 +246,7 @@ public class Piece {
 
         if (isValidMove(newBlocks, field)) {
             this.blocks = newBlocks;
+            this.centroid.x += Constants.BLOCK_SIZE;
         }
 
     }
@@ -260,13 +261,11 @@ public class Piece {
         }
 
         for (int i = 0; i < Constants.PIECE_SIZE; i++) {
-            Block centroid = newBlocks.get(this.centroidBlockPos);
-            newBlocks.get(i).rotate90(centroid.pos, clockwise);
+            newBlocks.get(i).rotate90(this.centroid, clockwise);
         }
 
         if (isValidMove(newBlocks, field)) {
             this.blocks = newBlocks;
-            this.centroid = newCentroid;
         }
 
     }

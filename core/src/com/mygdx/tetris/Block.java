@@ -25,10 +25,12 @@ public class Block {
     }
 
     private void rotate(Vector2 center, float degree) {
-        float x = this.pos.x;
-        float y = this.pos.y;
+        float x = this.pos.x + Constants.BLOCK_SIZE / 2;
+        float y = this.pos.y + Constants.BLOCK_SIZE / 2;
         this.pos.x = center.x + (x - center.x) * MathUtils.cosDeg(degree) - (y - center.y) * MathUtils.sinDeg(degree);
         this.pos.y = center.y + (y - center.y) * MathUtils.cosDeg(degree) + (x - center.x) * MathUtils.sinDeg(degree);
+        this.pos.x -= Constants.BLOCK_SIZE / 2;
+        this.pos.y -= Constants.BLOCK_SIZE / 2;
     }
 
     // Rotates block around a point.
