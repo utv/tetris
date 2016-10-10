@@ -13,6 +13,8 @@ import java.util.Random;
 
 /**
  * Created by Computer on 9/8/2016.
+ *
+ * Wall kicks: https://tetris.wiki/SRS#Wall_Kicks
  */
 public class Piece {
     public static final String TAG = Piece.class.getName();
@@ -251,11 +253,13 @@ public class Piece {
 
     }
 
+    /*
+     * Rotates if either against the wall or overlaps with other blocks
+     */
     public void rotate(boolean clockwise, Field field) {
         if (!this.canRotate) return;
 
         Array<Block> newBlocks = new Array<Block>(Constants.PIECE_SIZE);
-        Vector2 newCentroid = new Vector2(this.centroid.x, this.centroid.y);
         for (int i = 0; i < Constants.PIECE_SIZE; i++) {
             newBlocks.add(new Block(this.blocks.get(i).pos));
         }
