@@ -34,6 +34,6 @@ public class Constants {
     }
 
     enum PieceType {
-        SQUARE, STICK, T_SHAPE, L_SHAPE, S_SHAPE;
+        SQUARE, STICK, T_SHAPE, L_SHAPE, S_SHAPE, J_SHAPE;
     }
 }

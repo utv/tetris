@@ -42,7 +42,7 @@ public class Piece {
     }
 
     public void generate() {
-        int rand = new Random().nextInt(3);
+        int rand = new Random().nextInt(4);
         if (rand == 0) {
             square(Constants.squareOrigin);
             //stick(Constants.stickOrigin);
@@ -53,6 +53,27 @@ public class Piece {
         else if (rand == 2) {
             tShape(Constants.pieceOrigin);
         }
+        else if (rand == 3) {
+            jShape(Constants.pieceOrigin);
+        }
+    }
+
+    /*
+     *  J shape
+     */
+    public void jShape(Vector2 origin) {
+        this.type = Constants.PieceType.J_SHAPE;
+        this.canRotate = true;
+        this.isMoving = true;
+
+        Vector2 pos = new Vector2(origin.x, origin.y);
+        this.blocks.set(0, new Block(pos));
+        for (int i = 1; i < Constants.PIECE_SIZE; i++) {
+            pos = new Vector2(origin.x + (i - 1) * Constants.BLOCK_SIZE, origin.y - Constants.BLOCK_SIZE);
+            this.blocks.set(i, new Block(pos));
+        }
+        this.centroid =
+            new Vector2(this.blocks.get(1).pos.x + Constants.BLOCK_SIZE / 2, this.blocks.get(1).pos.y + Constants.BLOCK_SIZE / 2);
     }
 
     /*
@@ -105,7 +126,16 @@ public class Piece {
 
     public void update(float delta, Field field) {
         if (isHitGround()) {
-            this.addPieceToField(field);
+            for (Block block : this.blocks) {
+                int col = MathUtils.ceil(block.pos.x);
+                int row = MathUtils.ceil(block.pos.y);
+                if (field.blocks[row][col] == null) {
+                    float x = col * Constants.BLOCK_SIZE;
+                    float y = row * Constants.BLOCK_SIZE;
+                    field.blocks[row][col] = new Block(new Vector2(x, y));
+                }
+            }
+
             this.generate();
         }
         else if (isOnTopOfAnotherBlock(field)) {
@@ -204,7 +234,6 @@ public class Piece {
     }
 
     private void addPieceToField(Field field) {
-        int num = 0;
         for (Block block : this.blocks) {
             int row = getFieldRow(block.pos.y);
             int col = getFieldColumn(block.pos.x);
@@ -214,11 +243,9 @@ public class Piece {
                 float x = col * Constants.BLOCK_SIZE;
                 float y = row * Constants.BLOCK_SIZE;
                 field.blocks[row][col] = new Block(new Vector2(x, y));
-
             }
-            num++;
         }
-        Gdx.app.log(TAG, "num = " + num);
+
     }
 
     public void moveLeft(Field field) {
