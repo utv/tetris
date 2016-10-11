@@ -42,7 +42,7 @@ public class Piece {
     }
 
     public void generate() {
-        int rand = new Random().nextInt(4);
+        int rand = new Random().nextInt(5);
         if (rand == 0) {
             square(Constants.squareOrigin);
             //stick(Constants.stickOrigin);
@@ -56,6 +56,32 @@ public class Piece {
         else if (rand == 3) {
             jShape(Constants.pieceOrigin);
         }
+        else if (rand == 4) {
+            sShape(Constants.pieceOrigin);
+        }
+    }
+
+    /*
+     *  S shape
+     */
+    public void sShape(Vector2 origin) {
+        this.type = Constants.PieceType.S_SHAPE;
+        this.canRotate = true;
+        this.isMoving = true;
+
+        Vector2 pos = new Vector2(origin.x, origin.y);
+        this.blocks.set(0, new Block(pos));
+        for (int i = 0; i < Constants.PIECE_SIZE / 2; i++) {
+            pos = new Vector2(origin.x + i * Constants.BLOCK_SIZE, origin.y);
+            this.blocks.set(i, new Block(pos));
+        }
+        for (int i = Constants.PIECE_SIZE / 2; i < Constants.PIECE_SIZE; i++) {
+            pos = new Vector2(origin.x + (i - 1) * Constants.BLOCK_SIZE, origin.y + Constants.BLOCK_SIZE);
+            this.blocks.set(i, new Block(pos));
+        }
+        this.centroid =
+                new Vector2(this.blocks.get(1).pos.x + Constants.BLOCK_SIZE / 2, this.blocks.get(1).pos.y + Constants.BLOCK_SIZE / 2);
+
     }
 
     /*
@@ -186,9 +212,8 @@ public class Piece {
 
     private boolean isOnField(Array<Block> newBlocks) {
         for (Block block: newBlocks) {
-            int col = MathUtils.ceil(block.pos.x);
-            if (col < 0) return false;
-            if (col > (Constants.FIELD_WIDTH - 1) * Constants.BLOCK_SIZE) return false;
+            if (block.pos.x < 0) return false;
+            if (block.pos.x > (Constants.FIELD_WIDTH - 1) * Constants.BLOCK_SIZE) return false;
         }
         return true;
     }
