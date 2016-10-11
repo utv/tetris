@@ -127,8 +127,11 @@ public class Piece {
     public void update(float delta, Field field) {
         if (isHitGround()) {
             for (Block block : this.blocks) {
-                int col = MathUtils.ceil(block.pos.x);
-                int row = MathUtils.ceil(block.pos.y);
+                int row = 0;
+                if (block.pos.y > 0.0f) row = MathUtils.ceil(block.pos.y);
+                int col = getFieldColumn(block.pos.x);
+                Gdx.app.log(TAG, "x = " + block.pos.x + ", col = " + col);
+                Gdx.app.log(TAG, "y = " + block.pos.y + ", row = " + row);
                 if (field.blocks[row][col] == null) {
                     float x = col * Constants.BLOCK_SIZE;
                     float y = row * Constants.BLOCK_SIZE;
@@ -282,6 +285,7 @@ public class Piece {
 
     /*
      * Rotates if either against the wall or overlaps with other blocks
+     * No wall kicks
      */
     public void rotate(boolean clockwise, Field field) {
         if (!this.canRotate) return;
