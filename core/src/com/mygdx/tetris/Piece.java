@@ -165,11 +165,11 @@ public class Piece {
                 }
             }
 
-            this.generate();
+            //this.generate();
         }
         else if (isOnTopOfAnotherBlock(field)) {
             this.addPieceToField(field);
-            this.generate();
+            //this.generate();
         }
         else if (this.isMoving) {
             for (Block block : blocks) {
@@ -190,7 +190,7 @@ public class Piece {
         return new Vector2(col, row);
     }
 
-    private int getFieldRow(float y) {
+    protected int getFieldRow(float y) {
         int remainder  = (int) (y % Constants.FIELD_HEIGHT);
         int row;
         if (y - remainder > 0.5) row = MathUtils.ceil(y);
@@ -200,7 +200,7 @@ public class Piece {
         return Math.min(Constants.FIELD_HEIGHT - 1, row);
     }
 
-    private int getFieldColumn(float x) {
+    protected int getFieldColumn(float x) {
         int remainder  = (int) (x % Constants.FIELD_WIDTH);
         int col;
         if (x - remainder > 0.5) col = MathUtils.ceil(x);
@@ -242,7 +242,7 @@ public class Piece {
         return false;
     }
 
-    private boolean isOnTopOfAnotherBlock(Field field) {
+    protected boolean isOnTopOfAnotherBlock(Field field) {
         for (Block block : this.blocks) {
             int blockRow = getFieldRow(block.pos.y);
             int blockCol = getFieldColumn(block.pos.x);
@@ -261,7 +261,7 @@ public class Piece {
         return true;
     }
 
-    private void addPieceToField(Field field) {
+    protected void addPieceToField(Field field) {
         for (Block block : this.blocks) {
             int row = getFieldRow(block.pos.y);
             int col = getFieldColumn(block.pos.x);
@@ -331,8 +331,7 @@ public class Piece {
     }
 
     public void attach() {
-        for (Block block :
-                this.blocks) {
+        for (Block block : this.blocks) {
             block.velocity.y *= 10.5f;
         }
     }

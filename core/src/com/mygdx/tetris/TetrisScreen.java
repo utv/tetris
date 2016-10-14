@@ -7,8 +7,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -23,7 +21,7 @@ public class TetrisScreen extends InputAdapter implements Screen {
     ScreenViewport hudViewport;
     Constants.State state;
     Field field;
-    Piece piece;
+    FallingPiece fallingPiece;
     ShapeRenderer renderer;
 
     @Override
@@ -32,7 +30,7 @@ public class TetrisScreen extends InputAdapter implements Screen {
         renderer = new ShapeRenderer();
         renderer.setAutoShapeType(true);
         field = new Field(this.tetrisViewport);
-        piece = new Piece(this.tetrisViewport);
+        fallingPiece = new FallingPiece(this.tetrisViewport);
         state = Constants.State.PIECE_MOVING;
         Gdx.input.setInputProcessor(this);
     }
@@ -40,9 +38,9 @@ public class TetrisScreen extends InputAdapter implements Screen {
     @Override
     public void render(float delta) {
         // processInput
-        processInput(delta, state, piece, field);
+        processInput(delta, state, fallingPiece, field);
         // update
-        update(delta, state, piece, field);
+        update(delta, state, fallingPiece, field);
 
         // render
         tetrisViewport.apply(true);
@@ -51,14 +49,14 @@ public class TetrisScreen extends InputAdapter implements Screen {
 
         renderer.setProjectionMatrix(tetrisViewport.getCamera().combined);
         renderer.begin();
-        piece.render(renderer);
+        fallingPiece.render(renderer);
         field.render(renderer);
         renderer.end();
     }
 
-    private void update(float delta, Constants.State state, Piece piece, Field field) {
+    private void update(float delta, Constants.State state, Piece fallingPiece, Field field) {
 
-        piece.update(delta, field);
+        fallingPiece.update(delta, field);
     }
 
     private void processInput(float delta, Constants.State state, Piece piece, Field field) {
@@ -95,8 +93,8 @@ public class TetrisScreen extends InputAdapter implements Screen {
     public void resize(int width, int height) {
         tetrisViewport.update(width, height, true);
         field.init();
-        piece.init();
-        piece.generate();
+        fallingPiece.init();
+        fallingPiece.generate();
     }
 
     @Override
