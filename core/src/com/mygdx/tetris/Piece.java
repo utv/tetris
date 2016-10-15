@@ -2,7 +2,6 @@ package com.mygdx.tetris;
 
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -131,7 +130,7 @@ public class Piece {
             Vector2 pos = new Vector2(origin.x + (i % 2) * Constants.BLOCK_SIZE, origin.y + (i / 2) * Constants.BLOCK_SIZE);
             this.blocks.set(i, new Block(pos));
         }
-        //this.centroid = this.blocks.get(3).pos;
+        //this.centroid = this.positions.get(3).pos;
     }
 
     /*
@@ -158,10 +157,10 @@ public class Piece {
                 int col = getFieldColumn(block.pos.x);
                 Gdx.app.log(TAG, "x = " + block.pos.x + ", col = " + col);
                 Gdx.app.log(TAG, "y = " + block.pos.y + ", row = " + row);
-                if (field.blocks[row][col] == null) {
+                if (field.positions[row][col] == null) {
                     float x = col * Constants.BLOCK_SIZE;
                     float y = row * Constants.BLOCK_SIZE;
-                    field.blocks[row][col] = new Block(new Vector2(x, y));
+                    field.positions[row][col] = new Block(new Vector2(x, y));
                 }
             }
 
@@ -228,7 +227,7 @@ public class Piece {
     public boolean isOverlap(Array<Block> newBlocks, Field field) {
         for (int row = 0; row < Constants.FIELD_HEIGHT; row++) {
             for (int col = 0; col < Constants.FIELD_WIDTH; col++) {
-                if (field.blocks[row][col] != null) {
+                if (field.positions[row][col] != null) {
                     for (int i = 0; i < Constants.PIECE_SIZE; i++) {
                         Vector2 pos = newBlocks.get(i).pos;
                         if (getFieldColumn(pos.x) == col && getFieldRow(pos.y) == row) {
@@ -246,7 +245,7 @@ public class Piece {
         for (Block block : this.blocks) {
             int blockRow = getFieldRow(block.pos.y);
             int blockCol = getFieldColumn(block.pos.x);
-            if (blockRow - 1 >= 0 && field.blocks[blockRow - 1][blockCol] != null) {
+            if (blockRow - 1 >= 0 && field.positions[blockRow - 1][blockCol] != null) {
                 Gdx.app.log(TAG, "Yes::isOnTopOfAnotherBlock:: row = " + blockRow  + ", col = " + blockCol);
                 return true;
             }
@@ -267,10 +266,10 @@ public class Piece {
             int col = getFieldColumn(block.pos.x);
             Gdx.app.log(TAG, "x = " + block.pos.x + ", y = " + block.pos.y);
             Gdx.app.log(TAG, "row = " + row + ", col = " + col);
-            if (field.blocks[row][col] == null) {
+            if (field.positions[row][col] == null) {
                 float x = col * Constants.BLOCK_SIZE;
                 float y = row * Constants.BLOCK_SIZE;
-                field.blocks[row][col] = new Block(new Vector2(x, y));
+                field.positions[row][col] = new Block(new Vector2(x, y));
             }
         }
 
@@ -309,7 +308,7 @@ public class Piece {
     }
 
     /*
-     * Rotates if either against the wall or overlaps with other blocks
+     * Rotates if either against the wall or overlaps with other positions
      * No wall kicks
      */
     public void rotate(boolean clockwise, Field field) {

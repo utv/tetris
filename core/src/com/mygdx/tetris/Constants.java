@@ -30,7 +30,7 @@ public class Constants {
         Constants.FIELD_HEIGHT);
 
     enum State {
-        PIECE_MOVING, PIECE_HIT;
+        PIECE_MOVING, PIECE_HIT, ROW_DELETE;
     }
 
     enum PieceType {

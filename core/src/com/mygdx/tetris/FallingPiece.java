@@ -22,10 +22,10 @@ public class FallingPiece extends Piece {
                 int col = getFieldColumn(block.pos.x);
                 Gdx.app.log(TAG, "x = " + block.pos.x + ", col = " + col);
                 Gdx.app.log(TAG, "y = " + block.pos.y + ", row = " + row);
-                if (field.blocks[row][col] == null) {
+                if (field.positions[row][col] == null) {
                     float x = col * Constants.BLOCK_SIZE;
                     float y = row * Constants.BLOCK_SIZE;
-                    field.blocks[row][col] = new Block(new Vector2(x, y));
+                    field.positions[row][col] = new Block(new Vector2(x, y));
                 }
             }
 
