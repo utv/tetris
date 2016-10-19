@@ -14,6 +14,10 @@ public class Block {
     Vector2 pos;
     Vector2 velocity;
 
+    public Block(Block block) {
+        this.pos = new Vector2(block.pos.x, block.pos.y);
+        this.velocity = new Vector2(Constants.BLOCK_VELOCITY.x, Constants.BLOCK_VELOCITY.y);
+    }
 
     public Block(Vector2 pos) {
         this.pos = new Vector2(pos.x, pos.y);

@@ -41,7 +41,8 @@ public class Piece {
     }
 
     public void generate() {
-        int rand = new Random().nextInt(5);
+        int rand = new Random().nextInt(2);
+//        int rand = new Random().nextInt(5);
         if (rand == 0) {
             square(Constants.squareOrigin);
             //stick(Constants.stickOrigin);
@@ -130,7 +131,7 @@ public class Piece {
             Vector2 pos = new Vector2(origin.x + (i % 2) * Constants.BLOCK_SIZE, origin.y + (i / 2) * Constants.BLOCK_SIZE);
             this.blocks.set(i, new Block(pos));
         }
-        //this.centroid = this.positions.get(3).pos;
+        this.centroid = this.blocks.get(3).pos;
     }
 
     /*
@@ -157,10 +158,10 @@ public class Piece {
                 int col = getFieldColumn(block.pos.x);
                 Gdx.app.log(TAG, "x = " + block.pos.x + ", col = " + col);
                 Gdx.app.log(TAG, "y = " + block.pos.y + ", row = " + row);
-                if (field.positions[row][col] == null) {
+                if (field.blocks[row][col] == null) {
                     float x = col * Constants.BLOCK_SIZE;
                     float y = row * Constants.BLOCK_SIZE;
-                    field.positions[row][col] = new Block(new Vector2(x, y));
+                    field.blocks[row][col] = new Block(new Vector2(x, y));
                 }
             }
 
@@ -176,7 +177,7 @@ public class Piece {
             }
 
             // updates centroids
-            this.centroid.mulAdd(this.blocks.get(0).velocity, delta);
+            // this.centroid.mulAdd(this.blocks.get(0).velocity, delta);
 
         }
     }
@@ -227,7 +228,7 @@ public class Piece {
     public boolean isOverlap(Array<Block> newBlocks, Field field) {
         for (int row = 0; row < Constants.FIELD_HEIGHT; row++) {
             for (int col = 0; col < Constants.FIELD_WIDTH; col++) {
-                if (field.positions[row][col] != null) {
+                if (field.blocks[row][col] != null) {
                     for (int i = 0; i < Constants.PIECE_SIZE; i++) {
                         Vector2 pos = newBlocks.get(i).pos;
                         if (getFieldColumn(pos.x) == col && getFieldRow(pos.y) == row) {
@@ -245,7 +246,7 @@ public class Piece {
         for (Block block : this.blocks) {
             int blockRow = getFieldRow(block.pos.y);
             int blockCol = getFieldColumn(block.pos.x);
-            if (blockRow - 1 >= 0 && field.positions[blockRow - 1][blockCol] != null) {
+            if (blockRow - 1 >= 0 && field.blocks[blockRow - 1][blockCol] != null) {
                 Gdx.app.log(TAG, "Yes::isOnTopOfAnotherBlock:: row = " + blockRow  + ", col = " + blockCol);
                 return true;
             }
@@ -266,68 +267,15 @@ public class Piece {
             int col = getFieldColumn(block.pos.x);
             Gdx.app.log(TAG, "x = " + block.pos.x + ", y = " + block.pos.y);
             Gdx.app.log(TAG, "row = " + row + ", col = " + col);
-            if (field.positions[row][col] == null) {
+            if (field.blocks[row][col] == null) {
                 float x = col * Constants.BLOCK_SIZE;
                 float y = row * Constants.BLOCK_SIZE;
-                field.positions[row][col] = new Block(new Vector2(x, y));
+                field.blocks[row][col] = new Block(new Vector2(x, y));
             }
         }
 
     }
 
-    public void moveLeft(Field field) {
-        // new block positions
-        Array<Block> newBlocks = new Array<Block>(Constants.PIECE_SIZE);
-        for (int i = 0; i < Constants.PIECE_SIZE; i++) {
-            newBlocks.add(new Block(this.blocks.get(i).pos));
-            Block added = newBlocks.peek();
-            added.pos.x -= Constants.BLOCK_SIZE;
-        }
-
-        if (isValidMove(newBlocks, field)) {
-            this.blocks = newBlocks;
-            this.centroid.x -= Constants.BLOCK_SIZE;
-        }
-
-    }
-
-    public void moveRight(Field field) {
-        // new block positions
-        Array<Block> newBlocks = new Array<Block>(Constants.PIECE_SIZE);
-        for (int i = 0; i < Constants.PIECE_SIZE; i++) {
-            newBlocks.add(new Block(this.blocks.get(i).pos));
-            Block added = newBlocks.peek();
-            added.pos.x += Constants.BLOCK_SIZE;
-        }
-
-        if (isValidMove(newBlocks, field)) {
-            this.blocks = newBlocks;
-            this.centroid.x += Constants.BLOCK_SIZE;
-        }
-
-    }
-
-    /*
-     * Rotates if either against the wall or overlaps with other positions
-     * No wall kicks
-     */
-    public void rotate(boolean clockwise, Field field) {
-        if (!this.canRotate) return;
-
-        Array<Block> newBlocks = new Array<Block>(Constants.PIECE_SIZE);
-        for (int i = 0; i < Constants.PIECE_SIZE; i++) {
-            newBlocks.add(new Block(this.blocks.get(i).pos));
-        }
-
-        for (int i = 0; i < Constants.PIECE_SIZE; i++) {
-            newBlocks.get(i).rotate90(this.centroid, clockwise);
-        }
-
-        if (isValidMove(newBlocks, field)) {
-            this.blocks = newBlocks;
-        }
-
-    }
 
     public void attach() {
         for (Block block : this.blocks) {

@@ -1,5 +1,6 @@
 package com.mygdx.tetris;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -11,8 +12,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class Field {
     public static final String TAG = Field.class.getName();
     Viewport viewport;
-    Block[][] positions;
-    Array<Block> blocks;
+    Block[][] blocks;
+    Array<Block> fallingBlocks;
+    Piece fallingPiece;
 
     public Field(Viewport viewport) {
         this.viewport = viewport;
@@ -20,59 +22,77 @@ public class Field {
     }
 
     public void init() {
-        this.blocks = new Array<Block>(Constants.FIELD_HEIGHT * Constants.FIELD_WIDTH);
+        this.fallingBlocks = new Array<Block>(Constants.FIELD_HEIGHT * Constants.FIELD_WIDTH);
 
-        positions = new Block[Constants.FIELD_HEIGHT][Constants.FIELD_WIDTH];
+        blocks = new Block[Constants.FIELD_HEIGHT][Constants.FIELD_WIDTH];
         for (int row = 0; row < Constants.FIELD_HEIGHT; row++) {
             for (int col = 0; col < Constants.FIELD_WIDTH; col++) {
-                positions[row][col] = null;
+                blocks[row][col] = null;
             }
         }
     }
 
     public void update(float delta) {
-        // checks if adjacent rows are full of positions from bottom to top, then removes rows.
-
-        int cnt = 0;
-        Vector2 velocity = Constants.BLOCK_VELOCITY;
-        Constants.State state = null;
-
+        // deletes filled rows
+        int lastDeletedRow = -1;
         for (int row = 0; row < Constants.FIELD_HEIGHT; row++) {
-            // counts positions in a row
+            int numBlockInRow = 0;
             for (int col = 0; col < Constants.FIELD_WIDTH; col++) {
-                if (positions[row][col] != null) cnt++;
-                else break;
-            }
-            // resets row
-            if (cnt == Constants.FIELD_WIDTH) {
-                for (int col = 0; col < Constants.FIELD_WIDTH; col++) {
-                    this.positions[row][col] = null;
+                if (this.blocks[row][col] != null) {
+                    numBlockInRow++;
                 }
-
-                state = Constants.State.ROW_DELETE;
             }
-            cnt = 0;
+
+            // exits loop with some rows deleted
+            if (numBlockInRow < Constants.FIELD_WIDTH && lastDeletedRow >= 0) {
+                break;
+            }
+
+            // deletes a row
+            if (numBlockInRow == Constants.FIELD_WIDTH) {
+                for (int col = 0; col < Constants.FIELD_WIDTH; col++) {
+                    this.blocks[row][col] = null;
+                }
+                lastDeletedRow = row;
+            }
         }
 
-        if (state == Constants.State.ROW_DELETE) {
-            for (int row = 0; row < Constants.FIELD_HEIGHT; row++) {
-                for (int col = 0; col < Constants.FIELD_WIDTH; col++) {
-                    if (this.positions[row][col] != null) {
-                        this.positions[row][col].velocity = new Vector2(velocity.x, velocity.y);
-                        this.blocks.add(this.positions[row][col]);
+        // creates a group of falling blocks if rows are filled
+        if (lastDeletedRow >= 0) {
+            Gdx.app.log(TAG, "lastDeletedRow = " + lastDeletedRow);
+            this.fallingBlocks.clear();
+            if (lastDeletedRow >= 0 && lastDeletedRow + 1 < Constants.FIELD_HEIGHT) {
+                for (int row = lastDeletedRow + 1; row < Constants.FIELD_HEIGHT; row++) {
+                    for (int col = 0; col < Constants.FIELD_WIDTH; col++) {
+                        if (this.blocks[row][col] != null) {
+                            this.fallingBlocks.add(new Block(this.blocks[row][col].pos));
+                            this.blocks[row][col] = null;
+                        }
                     }
                 }
             }
         }
 
+        // remaining blocks fall
+        for (Block block : fallingBlocks) {
+            block.update(delta);
+        }
 
     }
 
     public void render(ShapeRenderer renderer) {
+
+        for (Block falling : fallingBlocks) {
+            if (falling != null) {
+                falling.velocity = new Vector2(Constants.BLOCK_VELOCITY).add(0.0f, 2.0f);
+                falling.render(renderer);
+            }
+        }
+
         for (int row = 0; row < Constants.FIELD_HEIGHT; row++) {
             for (int col = 0; col < Constants.FIELD_WIDTH; col++) {
-                if (positions[row][col] != null)
-                    positions[row][col].render(renderer);
+                if (blocks[row][col] != null)
+                    blocks[row][col].render(renderer);
             }
         }
     }

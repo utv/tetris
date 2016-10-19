@@ -54,12 +54,12 @@ public class TetrisScreen extends InputAdapter implements Screen {
         renderer.end();
     }
 
-    private void update(float delta, Constants.State state, Piece fallingPiece, Field field) {
-
+    private void update(float delta, Constants.State state, FallingPiece fallingPiece, Field field) {
+        field.update(delta);
         fallingPiece.update(delta, field);
     }
 
-    private void processInput(float delta, Constants.State state, Piece piece, Field field) {
+    private void processInput(float delta, Constants.State state, FallingPiece piece, Field field) {
 
         if (piece.isMoving){
             if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
