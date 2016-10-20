@@ -14,7 +14,7 @@ public class Field {
     Viewport viewport;
     Block[][] blocks;
     Array<Block> fallingBlocks;
-    Piece fallingPiece;
+    Piece remainingBlocks;
 
     public Field(Viewport viewport) {
         this.viewport = viewport;
@@ -23,6 +23,7 @@ public class Field {
 
     public void init() {
         this.fallingBlocks = new Array<Block>(Constants.FIELD_HEIGHT * Constants.FIELD_WIDTH);
+        this.remainingBlocks = new Piece(this.viewport);
 
         blocks = new Block[Constants.FIELD_HEIGHT][Constants.FIELD_WIDTH];
         for (int row = 0; row < Constants.FIELD_HEIGHT; row++) {
@@ -32,7 +33,7 @@ public class Field {
         }
     }
 
-    public void update(float delta) {
+    public int update(float delta) {
         // deletes filled rows
         int lastDeletedRow = -1;
         for (int row = 0; row < Constants.FIELD_HEIGHT; row++) {
@@ -57,27 +58,7 @@ public class Field {
             }
         }
 
-        // creates a group of falling blocks if rows are filled
-        if (lastDeletedRow >= 0) {
-            Gdx.app.log(TAG, "lastDeletedRow = " + lastDeletedRow);
-            this.fallingBlocks.clear();
-            if (lastDeletedRow >= 0 && lastDeletedRow + 1 < Constants.FIELD_HEIGHT) {
-                for (int row = lastDeletedRow + 1; row < Constants.FIELD_HEIGHT; row++) {
-                    for (int col = 0; col < Constants.FIELD_WIDTH; col++) {
-                        if (this.blocks[row][col] != null) {
-                            this.fallingBlocks.add(new Block(this.blocks[row][col].pos));
-                            this.blocks[row][col] = null;
-                        }
-                    }
-                }
-            }
-        }
-
-        // remaining blocks fall
-        for (Block block : fallingBlocks) {
-            block.update(delta);
-        }
-
+        return lastDeletedRow;
     }
 
     public void render(ShapeRenderer renderer) {

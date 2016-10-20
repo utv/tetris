@@ -22,6 +22,7 @@ public class TetrisScreen extends InputAdapter implements Screen {
     Constants.State state;
     Field field;
     FallingPiece fallingPiece;
+    Piece remainingBlocks;
     ShapeRenderer renderer;
 
     @Override
@@ -31,6 +32,7 @@ public class TetrisScreen extends InputAdapter implements Screen {
         renderer.setAutoShapeType(true);
         field = new Field(this.tetrisViewport);
         fallingPiece = new FallingPiece(this.tetrisViewport);
+        remainingBlocks = new Piece(this.tetrisViewport);
         state = Constants.State.PIECE_MOVING;
         Gdx.input.setInputProcessor(this);
     }
@@ -51,16 +53,31 @@ public class TetrisScreen extends InputAdapter implements Screen {
         renderer.begin();
         fallingPiece.render(renderer);
         field.render(renderer);
+        remainingBlocks.render(renderer);
         renderer.end();
     }
 
     private void update(float delta, Constants.State state, FallingPiece fallingPiece, Field field) {
-        field.update(delta);
+        int lastDeletedRow = field.update(delta);
+        // creates a group of falling blocks if rows are filled
+        if (lastDeletedRow >= 0) {
+            this.remainingBlocks.blocks.clear();
+            if (lastDeletedRow >= 0 && lastDeletedRow + 1 < Constants.FIELD_HEIGHT) {
+                for (int row = lastDeletedRow + 1; row < Constants.FIELD_HEIGHT; row++) {
+                    for (int col = 0; col < Constants.FIELD_WIDTH; col++) {
+                        if (this.field.blocks[row][col] != null) {
+                            this.remainingBlocks.blocks.add(new Block(this.field.blocks[row][col].pos));
+                            this.field.blocks[row][col] = null;
+                        }
+                    }
+                }
+            }
+        }
+        this.remainingBlocks.update(delta, field);
         fallingPiece.update(delta, field);
     }
 
     private void processInput(float delta, Constants.State state, FallingPiece piece, Field field) {
-
         if (piece.isMoving){
             if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
                 piece.rotate(false, field);

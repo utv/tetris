@@ -74,10 +74,10 @@ public class FallingPiece extends Piece {
         if (isHitGround()) {
             for (Block block : this.blocks) {
                 int row = 0;
-                if (block.pos.y > 0.0f) row = MathUtils.ceil(block.pos.y);
+                if (block.pos.y > 0.0f) row = getFieldRow(block.pos.y);
                 int col = getFieldColumn(block.pos.x);
-                Gdx.app.log(TAG, "x = " + block.pos.x + ", col = " + col);
-                Gdx.app.log(TAG, "y = " + block.pos.y + ", row = " + row);
+                Gdx.app.log(TAG, "piece x = " + block.pos.x + ", col = " + col);
+                Gdx.app.log(TAG, "piece y = " + block.pos.y + ", row = " + row);
                 if (field.blocks[row][col] == null) {
                     float x = col * Constants.BLOCK_SIZE;
                     float y = row * Constants.BLOCK_SIZE;

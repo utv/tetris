@@ -34,13 +34,10 @@ public class Piece {
 
     public void init() {
         this.blocks = new Array<Block>(Constants.PIECE_SIZE);
-        for (int i = 0; i < Constants.PIECE_SIZE; i++) {
-            this.blocks.add(new Block(new Vector2(0, 0)));
-        }
-
     }
 
     public void generate() {
+        this.blocks.clear();
         int rand = new Random().nextInt(2);
 //        int rand = new Random().nextInt(5);
         if (rand == 0) {
@@ -73,11 +70,13 @@ public class Piece {
         this.blocks.set(0, new Block(pos));
         for (int i = 0; i < Constants.PIECE_SIZE / 2; i++) {
             pos = new Vector2(origin.x + i * Constants.BLOCK_SIZE, origin.y);
-            this.blocks.set(i, new Block(pos));
+            this.blocks.add(new Block(pos));
+            //this.blocks.set(i, new Block(pos));
         }
         for (int i = Constants.PIECE_SIZE / 2; i < Constants.PIECE_SIZE; i++) {
             pos = new Vector2(origin.x + (i - 1) * Constants.BLOCK_SIZE, origin.y + Constants.BLOCK_SIZE);
-            this.blocks.set(i, new Block(pos));
+            this.blocks.add(new Block(pos));
+            //this.blocks.set(i, new Block(pos));
         }
         this.centroid =
                 new Vector2(this.blocks.get(1).pos.x + Constants.BLOCK_SIZE / 2, this.blocks.get(1).pos.y + Constants.BLOCK_SIZE / 2);
@@ -96,7 +95,8 @@ public class Piece {
         this.blocks.set(0, new Block(pos));
         for (int i = 1; i < Constants.PIECE_SIZE; i++) {
             pos = new Vector2(origin.x + (i - 1) * Constants.BLOCK_SIZE, origin.y - Constants.BLOCK_SIZE);
-            this.blocks.set(i, new Block(pos));
+            this.blocks.add(new Block(pos));
+            //this.blocks.set(i, new Block(pos));
         }
         this.centroid =
             new Vector2(this.blocks.get(1).pos.x + Constants.BLOCK_SIZE / 2, this.blocks.get(1).pos.y + Constants.BLOCK_SIZE / 2);
@@ -111,11 +111,13 @@ public class Piece {
         this.isMoving = true;
         for (int i = 0; i < Constants.PIECE_SIZE - 1; i++) {
             Vector2 pos = new Vector2(origin.x + i * Constants.BLOCK_SIZE, origin.y);
-            this.blocks.set(i, new Block(pos));
+            this.blocks.add(new Block(pos));
+            //this.blocks.set(i, new Block(pos));
         }
 
         Vector2 pos = new Vector2(origin.x + Constants.BLOCK_SIZE, origin.y + Constants.BLOCK_SIZE);
-        this.blocks.set(Constants.PIECE_SIZE - 1, new Block(pos));
+        this.blocks.add(new Block(pos));
+        //this.blocks.set(Constants.PIECE_SIZE - 1, new Block(pos));
         this.centroid =
             new Vector2(this.blocks.get(1).pos.x + Constants.BLOCK_SIZE / 2, this.blocks.get(1).pos.y + Constants.BLOCK_SIZE / 2);
 
@@ -129,7 +131,8 @@ public class Piece {
             /*float x = (Constants.FIELD_WIDTH * Constants.BLOCK_SIZE / 2) - 2 * Constants.BLOCK_SIZE;
             float y = Constants.FIELD_HEIGHT;*/
             Vector2 pos = new Vector2(origin.x + (i % 2) * Constants.BLOCK_SIZE, origin.y + (i / 2) * Constants.BLOCK_SIZE);
-            this.blocks.set(i, new Block(pos));
+            this.blocks.add(new Block(pos));
+            //this.blocks.set(i, new Block(pos));
         }
         this.centroid = this.blocks.get(3).pos;
     }
@@ -145,7 +148,8 @@ public class Piece {
             /*float x = (Constants.FIELD_WIDTH * Constants.BLOCK_SIZE / 2) - 2 * Constants.BLOCK_SIZE;
             float y = Constants.FIELD_HEIGHT / 2;*/
             Vector2 pos = new Vector2(origin.x + i * Constants.BLOCK_SIZE, origin.y);
-            this.blocks.set(i, new Block(pos));
+            this.blocks.add(new Block(pos));
+            //this.blocks.set(i, new Block(pos));
         }
         this.centroid = new Vector2(this.blocks.get(2).pos.x, this.blocks.get(2).pos.y);
     }
@@ -154,7 +158,7 @@ public class Piece {
         if (isHitGround()) {
             for (Block block : this.blocks) {
                 int row = 0;
-                if (block.pos.y > 0.0f) row = MathUtils.ceil(block.pos.y);
+                if (block.pos.y > 0.0f) row = getFieldRow(block.pos.y);
                 int col = getFieldColumn(block.pos.x);
                 Gdx.app.log(TAG, "x = " + block.pos.x + ", col = " + col);
                 Gdx.app.log(TAG, "y = " + block.pos.y + ", row = " + row);
@@ -219,6 +223,7 @@ public class Piece {
     }
 
     public boolean isHitGround() {
+        Gdx.app.log(TAG, "isHitGround");
         for (Block block: this.blocks) {
             if (block.pos.y <= 0) return true;
         }
